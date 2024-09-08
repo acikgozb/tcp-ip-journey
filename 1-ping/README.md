@@ -7,15 +7,15 @@ It focuses on pinging `google.com`, which is a commonly known remote network.
 
 Like it is mentioned above, `ping` is a Unix tool that is used to test a connection to a host.
 
-One of the important things about `ping` is that it uses Internel Control Management Protocol (ICMP) packets to test the connection.
-This protocol lives on L3 of the _TCP/IP_ model (Network/Internet Layer), which allows our analysis to focus purely on the connection, unlike L7 protocols such as `HTTP/HTTPS` or `FTP/SFTP/TFTP`.
+One of the important things about `ping` is that it uses _Internet Control Management Protocol_ (ICMP) packets to test the connection.
+This protocol lives on L3 of the _TCP/IP_ model (Network/Internet Layer), which allows our analysis to focus purely on the connection, unlike L7 protocols such as _HTTP/HTTPS_ or _FTP/SFTP/TFTP_.
 Since ICMP lives on L3, it does not use TCP or UDP to function. It is encapsulated in a IPv4 packet.
 
 ICMP is mainly used to understand the `state` of the transmitted packet. Based on the status of the remote location, ICMP can return messages like:
 
-- Time-to-live Exceeded (TTL)
-- Destination Unreachable
-- Request Timed Out
+- `Time-to-live Exceeded (TTL)`
+- `Destination Unreachable`
+- `Request Timed Out`
 
 Using `ping` is pretty straightforward. Here is an example call that will be analyzed:
 
@@ -68,7 +68,7 @@ So if you are ready for an adventure, let us begin.
 Before diving into what is happening on the network itself, we have to define the "network" first.
 This analysis was written on a computer that was connected to a regular home network.
 
-In this "test" network, there are 2 main devices that is responsible from communication:
+In this "test" network, there are 2 main devices that is responsible from the communication:
 
 - NIC (Network Interface Card)
 - WAP (Wireless Access Point)
@@ -77,7 +77,7 @@ In this "test" network, there are 2 main devices that is responsible from commun
 
 A NIC is a piece of hardware that connects a device to a network. The device can be anything; computers, switches, routers, you name it.
 
-In this example, the computer uses its integrated NIC to connect to the wireless home network. As a result, there is an interface on the computer that we can analyze by using `ifconfig`:
+In this example, the test computer uses its integrated NIC to connect to the wireless home network. As a result, there is an interface on the computer that we can analyze by using `ifconfig`:
 
 ```bash
 # If your host do not have an Ethernet port, en0 is probably your Wireless interface
@@ -94,7 +94,7 @@ ifconfig en0
 # 	status: active
 ```
 
-`en0` interface of the computer is used for any communication through the network.
+In our test, `en0` interface of the computer is used for any communication through the test network.
 
 The output of `ifconfig en0` tells us many things but for the scope of the analysis, we will focus on `ether`, `inet`, `broadcast` fields in the further sections.
 
@@ -118,11 +118,11 @@ Okay, so to recap:
 - The WAP is also configured as a gateway (router) and a DNS server.
 
 Now that we defined what our "network" is, we can proceed with the analysis.
-As we progress through the analysis, the terms "gateway" and "DNS server" will be more clear.
+As we progress through, the terms "gateway" and "DNS server" will be more clear.
 
 ## Step 2: DNS Is Only For Humans
 
-Lets check our ping to `google.com` again. Though the analysis, I will frequently refer to it:
+Lets check our ping to `google.com` again. Throughout the analysis, I will frequently refer to it:
 
 ```bash
 ping -c1 google.com
@@ -144,7 +144,7 @@ Here comes the first "aha!" moment of the networking.
 
 IP address is the main concept that is used in networking to facilitate communication between devices.
 Internet Protocol sits on L3 of the TCP/IP model, and is the basis of the Internet itself.
-The domain names we use - _google.com, youtube.com, github.com, you name it_ - are just there for user convenience.
+The domain names we use - _google.com, youtube.com, github.com, you name it_ - are just there for user convenience. The L3 devices we use for networking only understands IP addresses, they basically have no idea what `google.com` means.
 By "tagging" an IP address with a domain name, it provides us two things:
 
 - Users of a domain can reference it by using its domain name from now on (_google.com_), which is a lot easier to remember compared to memorizing its IP address (_172.217.169.206_).
@@ -155,7 +155,7 @@ However, how does it know that the IP address of `google.com` is actually `172.2
 
 This is where _DNS servers_ join the adventure.
 
-This action of **getting the IP address from a domain name** is called _name resolution_ and this is primarily handled by DNS servers.
+This action of **resolving an IP address from a domain name** is called _name resolution_ and this is primarily handled by DNS servers.
 DNS servers do this by storing records that matches domain names with IP addresses.
 
 Essentially, what `ping` does is when it sees a domain name to connect (e.g `google.com`), first it sends a DNS query to a DNS server to ask for the IP address of the host.
@@ -203,7 +203,7 @@ As we can see, there are no records pointing to `google.com`, instead we have th
 - The host name `localhost` pointing the IP address `::1`. This is actually a _IPv6_ address, and it is a whole another world compared to _IPv4_ (or simply, IP).
 - The host name `broadcasthost` point to the IP address `255.255.255.255`. This IP address is used for broadcast messages, which will be explained in further sections.
 
-As a side info, `hosts` file is considered legacy and it is no longer the primary way of resolving domain names in the Internet.
+As a side info, `hosts` file is considered legacy and it is no longer the primary way of resolving domain names on the Internet.
 Therefore, in order to resolve `google.com`, the computer actually sends a DNS query to a DNS server, but which one?
 
 There are different ways which you can use to locate your configured DNS server. Here is a couple of them:
@@ -253,10 +253,10 @@ Now that we found our DNS server, now it's time to do the actual name resolution
 #### Step 2: Recursive Resolutions
 
 As I mentioned above, there are a _ton_ of DNS servers around the world.
-So we can make a guess that our DNS server located at `192.168.1.1` actually does not know every single IP address out in the Internet.
-But it's responsibility is to provide IP address to any host in the test network, which is `192.168.1.0`.
+So we can make a guess that our DNS server located at `192.168.1.1` probably does not know every single IP address out on the Internet.
+Nonetheless, it's responsibility is to provide IP address to any host in the test network, which is `192.168.1.0`.
 
-So, if our DNS server do not know every IP address, how does it retrieve the IP address of `google.com`, which is `172.217.169.206`?
+So, if our DNS server does not know every IP address, how does it retrieve the IP address of `google.com`, which is `172.217.169.206`?
 Here comes the next important thing about DNS, it is the fact that **a DNS server does its name resolution recursively**.
 
 So, what does recursion mean in this context?
@@ -266,9 +266,9 @@ But does a DNS server randomly send DNS queries to other servers? As you probabl
 
 Here is a rundown of how recursion works for `google.com`:
 
-1 - The name lookup actually starts in a reverse way. So, to understand where `google.com` is, first our test DNS server needs to find where `.com` lives. So it sends a DNS query to the _root DNS servers_ to find the location which holds information about `.com` records. The root DNS servers are globally well-known servers. For more information, you can check [this](https://www.iana.org/domains/root/servers) link.
+1 - The name lookup actually starts from the end of a domain name. So, to understand where `google.com` is, first our test DNS server needs to find where `.com` lives. So it sends a DNS query to the _root DNS servers_ to find the location which holds information about `.com` records. The root DNS servers are globally well-known servers. For more information, you can check [this](https://www.iana.org/domains/root/servers) link.
 
-2 - One of the root servers from the list responds where `.com` records live, back to our DNS server.
+2 - One of the root servers from the list responds to our DNS server with a list of locations that holds `.com` records.
 
 3 - At this point, our DNS server recursively send another query - this time to the `.com` servers - until it finds the location that holds `google.com`.
 
@@ -276,7 +276,7 @@ Here is a rundown of how recursion works for `google.com`:
 
 5 - Finally, our DNS server again recursively send another query - this time to the servers holding `google.com` - until it finally gets the IP address.
 
-6 - Once it gets the IP address, it is sent back to the `ping` to notify the destination of `google.com`.
+6 - Once it gets the IP address, it is sent back to the `ping`.
 
 As you can see, based on the domain name, there are quite a few steps to perform just to get the IP address of a domain.
 Since domain name resolution happens pretty frequently on the Internet, this process actually creates an overhead in each and every connection.
@@ -362,7 +362,7 @@ dig google.com +trace
 
 In this trace output, we first see NS (nameserver) records, which are records that point a server that may hold the information.
 `dig` uses these servers to search for `google.com`.
-Starting from the root servers, `dig` is eventually pointed to the DNS servers of Google (`ns1` through `ns4`), and then at the end one of those servers respond with the A record, which contains the IP address.
+Starting from the root servers, `dig` is eventually pointed to the DNS servers of Google (`ns1` through `ns4`), and then one of those servers respond with the A record at the end, which contains the IP address.
 
 As we can see from this output `+trace` option is useful to troubleshoot any DNS issues, or to verify the name resolution process.
 
