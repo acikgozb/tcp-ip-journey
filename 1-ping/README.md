@@ -94,11 +94,11 @@ ifconfig en0
 # 	status: active
 ```
 
-In our test, `en0` interface of the computer is used for any communication through the test network.
+In our test, `en0` interface of the host is used for any communication through the test network.
 
 The output of `ifconfig en0` tells us many things but for the scope of the analysis, we will focus on `ether`, `inet`, `broadcast` fields in the further sections.
 
-PS: The MAC address of the computer (named `ether` in the output) is masked for security purposes.
+PS: The MAC address of the host (named `ether` in the output) is masked for security purposes.
 
 ### WAP (Wireless Access Point)
 
@@ -177,11 +177,11 @@ But which DNS server should we send the query?
 
 Here comes another important point about DNS, there are _tons_ of DNS servers around the world, and there is a specific order of execution happening once a DNS query is sent from a host.
 
-The first place to look for DNS records is actually the computer itself.
+The first place to look for DNS records is actually the host itself.
 On Unix/Linux, there is a special file called `hosts` that can hold the DNS records.
-If the requested IP address can be found on the `hosts` file, the host actually does not send a DNS query segment to the network itself.
+If the requested IP address can be found on the `hosts` file, the host actually does not send a DNS query to the network itself.
 
-Let's check the `hosts` file on the example computer:
+Let's check the `hosts` file on the test host:
 
 ```bash
 cat /etc/hosts
@@ -201,14 +201,14 @@ As we can see, there are no records pointing to `google.com`, instead we have th
 
 - The host name `localhost` pointing the IP address `127.0.0.1`, which is the loopback address we frequently use during development or troubleshooting.
 - The host name `localhost` pointing the IP address `::1`. This is actually a _IPv6_ address, and it is a whole another world compared to _IPv4_ (or simply, IP).
-- The host name `broadcasthost` point to the IP address `255.255.255.255`. This IP address is used for broadcast messages, which will be explained in further sections.
+- The host name `broadcasthost` point to the IP address `255.255.255.255`. This is an alias IP address is used for broadcast messages, which will be explained in further sections.
 
 As a side info, `hosts` file is considered legacy and it is no longer the primary way of resolving domain names on the Internet.
-Therefore, in order to resolve `google.com`, the computer actually sends a DNS query to a DNS server, but which one?
+Therefore, in order to resolve `google.com`, the host actually sends a DNS query to a DNS server, but which one?
 
 There are different ways which you can use to locate your configured DNS server. Here is a couple of them:
 
-1 - On Unix/Linux, there is a nice command called `scutil` that can show you the name resolver configuration you have on your computer (by using the `--dns` flag):
+1 - On Unix/Linux, there is a nice command called `scutil` that can show you the name resolver configuration you have on your host (by using the `--dns` flag):
 
 ```bash
 scutil --dns
@@ -617,6 +617,7 @@ If you are good to go, let's dive into what happens in our host:
 
 1 - `ping` creates an ICMP Echo packet on our host to test the connection.
 ICMP is a L3 protocol, so the journey starts on L3.
+The IP address of the test host is used as the source IP address, and the IP address `ping` gets from the configured DNS server is used as the destination IP address.
 
 2 - ICMP hands this packet to IP, which is again a L3 protocol. The important thing in here is that the Protocol header value of the packet is ICMP, to let IP know which protocol to hand it over in the destination host.
 
@@ -692,11 +693,16 @@ Essentially, by using ARP our host can ask the question below to the network:
 
 **Hey, I need the MAC address of `192.168.1.1`, please let me know when you get this message.**
 
-Now, ARP is a L3 protocol, and same rules are applied to this protocol as well.
-An ARP packet needs to travel through the physical path, just as any other packet.
-We still do not have the MAC address though, so what is used as a MAC address?
+Now, ARP is a L3 protocol, and same rules are applied to this protocol as well:
 
-The answer is - ARP sends a _broadcast message_ to the whole network.
+1 - It needs a source IP, which is `192.168.1.1`.
+2 - It needs a source MAC address, which is the host's MAC address.
+2 - It needs a destination IP, since it is a broadcast message, ARP puts the _broadcast address_ of the subnet, which is `192.168.1.255`.
+
+However, An ARP packet needs to travel through the physical path just as any other packet.
+We still do not have the MAC address for the destination though, so what is used for that?
+
+The answer lies in the fact that ARP sends a _broadcast message_ to the whole network.
 And here comes another important thing about broadcasts - which is the fact that the MAC address of a broadcast message is `FF:FF:FF:FF:FF:FF`.
 
 When this MAC address is used in a packet, it indicates that this is a broadcast message so eventually the message gets send to every single device on our test network.
@@ -748,8 +754,13 @@ This field is used while collecting the frames on the destination device. The L2
 
 ### Summary
 
-To sum up, here is what has discussed on this section of the analysis:
+To sum up, here is what has discussed on this section:
 
-- And with this, we have completed our analysis of the first part of the journey - the path that our packet takes from our host to the gateway of our test network.
+- We discussed what a _router_ (gateway) is and how it is used in networking.
+- We discussed some of the differences between a _switch_ and a _router_.
+- We discussed about another important protocol called ARP, and talked about how MAC addresses are used to facilitate communcation between devices.
+- We discussed what happens in terms of TCP/IP layers, starting from L3 to L1.
+
+And with this section, we have completed our analysis of the first part of the journey - the path that our packet takes from our host to the gateway of our test network.
 
 Now, let's proceed with the analysis and see what happens when the signals hit the gateway.
