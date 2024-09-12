@@ -75,7 +75,7 @@ In this "test" network, there are 2 main devices that is responsible from the co
 
 ### NIC (Network Interface Card)
 
-A NIC is a piece of hardware that connects a device to a network. The device can be anything; computers, switches, routers, you name it.
+A NIC is a piece of hardware that connects a device to a network. NICs are mostly found in computers, servers and routers.
 
 In this example, the test computer uses its integrated NIC to connect to the wireless home network. As a result, there is an interface on the computer that we can analyze by using `ifconfig`:
 
@@ -635,6 +635,10 @@ A gateway is a L3 networking device (commonly known as router) that connects 2 o
 In this sense, you can think that it is really similar to a switch (a L2 device).
 However, there are key features that makes routers a _lot_ different than switches, here a list of some differences:
 
+**Routers are responsible from the logical path of a packet, whereas switches are responsible from physical path of a packet.**
+
+The main way of communication for routers is through IP addresses. For switches, it is MAC addresses instead.
+
 **Routers by default, separate broadcast domains of two networks.**
 
 A broadcast domain is a network segment where a host can send a specific message (called _broadcast message_) to reach all the network devices of that segment.
@@ -672,7 +676,7 @@ ipconfig getsummary en0
 ```
 
 6 - Now that IP knows the gateway address, it can forward the ICMP packet to it.
-However, there is another thing unknown at this point, which is essential for IP and pretty much all Ethernet communcations, to know before moving on with the transmission.
+However, there is another thing unknown at this point, which is essential for IP and pretty much all Ethernet communcations to know before moving on with the transmission.
 
 <hr>
 
@@ -696,6 +700,12 @@ Now, ARP is a L3 protocol, and same rules are applied to this protocol as well:
 1 - It needs a source IP, which is `192.168.1.1`.
 2 - It needs a source MAC address, which is the host's MAC address.
 2 - It needs a destination IP, since it is a broadcast message, ARP puts the _broadcast address_ of the subnet, which is `192.168.1.255`.
+
+---
+
+PS: The broadcast address of a subnet is _the last available address of a subnet_, and it does not have to be 255. It depends on the subnet mask.
+
+---
 
 However, An ARP packet needs to travel through the physical path just as any other packet.
 We still do not have the MAC address for the destination though, so what is used for that?
@@ -817,7 +827,7 @@ Of course - if we have a static way of configuring our routing tables, we have a
 
 #### Dynamic Routing
 
-Dynamic routing is a way of updating our gateway configuration _automatically_ by using _dynamic routing protocols_ and neigboring gateways on the Internet.
+Dynamic routing is a way of updating our gateway configuration _automatically_ by using _dynamic routing protocols_ and neighboring gateways.
 There are different branches of _routing protocols_ called _Interior Gateway Protocols (IGPs)_ and _Exterior Gateway Protocols (EGPs)_.
 
 IGPs contain 3 different groups in it which are called _Distance Vector (DV)_, _Link State (LS)_, and Hybrid (mix of both).
@@ -912,13 +922,13 @@ That is why - there is another type of NAT that was developed, which is called _
 
 PAT is a type of NAT that is commonly used in today's networks.
 The address translation in PAT is done by source ports, instead of IP addresses themselves.
-In this concept, there is only _one public IP address_ that is used for translation, but _the ports of the public IP address changes based on the source ports of each host_.
+In this concept, there is only _one public IP address_ that is used for translation, but _the ports of the public IP address change based on the source ports of each host_.
 
 By utilizing ports, even if NAT uses only one public IP address, it knows how to map back and forth.
 
 ---
 
-Now that we know how our private host sends packets: _ our gateway uses NAT to make the address routable_.
+Now that we know how our private host sends packets: _our gateway uses NAT to make the address routable_.
 
 ### Summary
 
