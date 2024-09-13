@@ -17,7 +17,7 @@ In this "test" network, there are 2 main devices that is responsible from the co
 - NIC (Network Interface Card)
 - WAP (Wireless Access Point)
 
-## <a id='nic-network-interface-card'></> NIC (Network Interface Card)
+## <a id='nic-network-interface-card' /> NIC (Network Interface Card)
 
 A NIC is a piece of hardware that connects a device to a network. NICs are mostly found in personal computers, servers and routers.
 
@@ -62,7 +62,7 @@ PS: Remember that in a wireless network the main way to communicate is by _sendi
 
 ---
 
-## <a id='summary'></> Summary
+## <a id='summary' /> Summary
 
 Okay, so to recap:
 

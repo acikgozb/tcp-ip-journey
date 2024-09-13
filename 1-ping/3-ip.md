@@ -34,7 +34,7 @@ How can we make sure that an IP address points a local or remote network?
 
 And here comes another vital point of TCP/IP - the "network" and "host" bits of an IP address.
 
-## <a id='the-parts-of-an-ip-address'></> The Parts of an IP Address
+## <a id='the-parts-of-an-ip-address'/> The Parts of an IP Address
 
 An IP address holds 32 bits - or 4 bytes, and by toggling these bits we create the decimal representation.
 Since each decimal part of an IP address is a byte, this means that the possible values of a decimal part can be between 0 and 255.
@@ -70,7 +70,7 @@ If not, then we can safely say that it is an address that lives on a remote netw
 And here's the news - we can "guess" that they are on a different network, but there is a wonderful way to verify it.
 Before jumping straight to the answer though, let's take a detour first.
 
-## <a id='the-history-of-ip'></> The History of IP
+## <a id='the-history-of-ip'/> The History of IP
 
 This detour is important because we need to see what happened in the past to understand the "why" of the networking concepts we frequently use in today's networking.
 At first, a _classful_ system is designed for IP to specify network addresses and available host addresses for each network.
@@ -103,7 +103,7 @@ The thing that actually solves this limitation is _IPv6_, but that is not the sc
 
 So, let's see what subnetting is and how it helps to answer our question.
 
-## <a id='subnetting'></> Subnetting
+## <a id='subnetting'/> Subnetting
 
 Before you continue reading, try to not think about the classful system we discussed above.
 The classful system is mentioned simply because we need to understand "why" there is a thing called subnetting.
@@ -215,7 +215,7 @@ _Given that there are 2 IP addresses `192.168.1.101` and `172.217.169.206`, do t
 With the help of our subnet mask, we can see that these IP addresses truly belong to different networks.
 For our test host to communicate with `172.217.169.206`, it really needs to go over the Internet.
 
-## <a id='summary'></> Summary
+## <a id='summary'/> Summary
 
 In this chapter of the analysis, we found out:
 

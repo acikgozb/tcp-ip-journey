@@ -29,7 +29,7 @@ Alright, let's see where this study takes us.
 
 <!--toc:end-->
 
-## <a id='what-is-ping'></> What is `ping`?
+## <a id='what-is-ping'/> What is `ping`?
 
 Like it is mentioned above, `ping` is a Unix tool that is used to test a connection to a host.
 
@@ -64,7 +64,7 @@ ping -c1 127.0.0.1
 
 Keep in mind that using the loopback address does not create a packet that traverses the network.
 
-## <a id='the-tip-of-the-iceberg'></> The Tip of the Iceberg
+## <a id='the-tip-of-the-iceberg'/> The Tip of the Iceberg
 
 First, let's see the case in action.
 Here is what we see if we `ping` `google.com`:
@@ -95,7 +95,7 @@ As you probably guessed, there is A LOT that happens behind the scenes.
 
 So if you are ready for an adventure, let us begin.
 
-## <a id='chapters'></> Chapters
+## <a id='chapters'/> Chapters
 
 Since the analysis is a bit long, I divided it into chapters - you can find them below:
 
@@ -108,7 +108,7 @@ Since the analysis is a bit long, I divided it into chapters - you can find them
 - [Step 7: Here Comes the ICMP Response](./7-icmp-response.md)
 - [Step 8: The Journey Ends Here](./8-journey-ends-here.md)
 
-## <a id='conclusion'></> Conclusion
+## <a id='conclusion'/> Conclusion
 
 Now you will never be able to see `ping` like before!
 With that said, we can conclude our analysis.

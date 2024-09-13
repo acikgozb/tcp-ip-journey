@@ -38,7 +38,7 @@ Here comes the next part we will discuss:
 
 So, what is a gateway?
 
-## <a id='gateway'></> Gateway
+## <a id='gateway'/> Gateway
 
 A gateway is a L3 networking device (commonly known as router) that connects 2 or more distinct networks.
 In this sense, you can think that it is really similar to a switch (a L2 device).
@@ -87,7 +87,7 @@ ipconfig getsummary en0
 6 - Now that IP knows the gateway address, it can forward the ICMP packet to it.
 However, there is another thing unknown at this point, which is essential for IP and pretty much all Ethernet communcations to know before moving on with the transmission.
 
-## <a id='mac-address'></> MAC Address
+## <a id='mac-address'/> MAC Address
 
 Up until this point, we mainly dealt with IP addresses, because we were analyzing the _logical path_ of the ICMP packet.
 However, there is also a _physical path_ of a packet that it actually needs to travel through.
@@ -167,7 +167,7 @@ This field is used while collecting the frames on the destination device. The L2
 
 10 - L2 hands the frames to L1 (Physical layer) and then bits are sent through the physical medium. The physical medium of our test network is wireless, so analog radio signals are created from digital signals and those signals are transmitted to be picked up by the gateway.
 
-## <a id='summary'></> Summary
+## <a id='summary'/> Summary
 
 To sum up, here is what has discussed on this chapter:
 

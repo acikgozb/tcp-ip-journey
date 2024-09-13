@@ -21,7 +21,7 @@ However, by determining the path, it brought us some questions along with it:
 
 So let's try to answer these questions.
 
-## <a id='the-determined-path'></> The Determined Path
+## <a id='the-determined-path'/> The Determined Path
 
 Like it is mentioned in previous chapter, our gateway chooses a path by checking its routing table.
 The routing table is mostly updated by _dynamic routing protocols_ with the help of _neighboring routers_.
@@ -38,7 +38,7 @@ Based on this information, we can say that:
 
 To fully answer our first question, we can utilize a perfect tool called `traceroute`.
 
-## <a id='traceroute'></> `traceroute`
+## <a id='traceroute'/> `traceroute`
 
 `traceroute` is a tool similar to `ping` that uses ICMP packets to understand the path of a packet.
 `traceroute` specifically uses _UDP_ and the _TTL_ attribute of ICMP to record the location of a packet.
@@ -94,7 +94,7 @@ Remember, gateways may choose different paths from their routing tables based on
 
 ---
 
-## <a id='hops'></> Hops
+## <a id='hops'/> Hops
 
 If we check the output, the very first thing we notice is the amount of IP addresses we have compared to the first example.
 The first IP address is our gateway's IP address, and the last one is the destination IP address.
@@ -139,7 +139,7 @@ ISPs have huge networks and if every gateway in those networks had a public IP a
 
 This is why the third gateway is pretty interesting, it basically tells us that **one of the possible paths that goes to google.com contains a private network**.
 
-## <a id='summary'></> Summary
+## <a id='summary'/> Summary
 
 In this chapter, we added one new tool called `traceroute` to our analysis to understand the path of our ICMP packet starting from our gateway to the destination itself.
 Remember, these were our questions:

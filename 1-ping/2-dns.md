@@ -1,6 +1,6 @@
 # Step 2: DNS Is Only For Humans
 
-## Table Of Contents
+## Table of Contents
 
 <!--toc:start-->
 
@@ -52,7 +52,7 @@ Once `ping` gets the IP address from a DNS server, then it attempts to connect t
 
 So, how does this "name resolution" actually work?
 
-## <a id='name-resolution-through-a-dns-server'></> Name Resolution Through a DNS Server
+## <a id='name-resolution-through-a-dns-server'/> Name Resolution Through a DNS Server
 
 Lets talk about DNS a little bit.
 DNS is a **L7 (Application Layer) Service** that allows us to find the IP address of a requested resource.
@@ -67,7 +67,7 @@ PS: Please note that DNS is not only used for name resolution - it's just one of
 So now we know that to resolve `google.com`, we need to send a DNS query to a DNS server via TCP/UDP by specifically using the port 53.
 But which DNS server should we send the query?
 
-## <a id='the-configured-dns-server'></> The Configured DNS Server
+## <a id='the-configured-dns-server'/> The Configured DNS Server
 
 Here comes another important point about DNS, there are _tons_ of DNS servers around the world, and there is a specific order of execution happening once a DNS query is sent from a host.
 
@@ -142,7 +142,7 @@ In the WAP section, I told that the example WAP was configured as a gateway (rou
 
 Now that we found our DNS server, now it's time to do the actual name resolution.
 
-## <a id='recursive-resolution'></> Recursive Resolutions
+## <a id='recursive-resolution'/> Recursive Resolutions
 
 As I mentioned above, there are a _ton_ of DNS servers around the world.
 So we can make a guess that our DNS server located at `192.168.1.1` probably does not know every single IP address out on the Internet.
@@ -266,7 +266,7 @@ PS: There are actually quite a bit of record types (A, AAAA, PTR, NS, MX, CNAME,
 
 ---
 
-## <a id='summary'></> Summary
+## <a id='summary'/> Summary
 
 Here is what has discussed in this part of the analysis:
 

@@ -53,7 +53,7 @@ And here comes another important concept that we encounter frequently - a gatewa
 
 So, let's see what this _routing table_ is.
 
-## <a id='routing-table'></> Routing Table
+## <a id='routing-table'/> Routing Table
 
 A routing table is the main tool that a gateway uses to determine the path of a packet.
 In other words, if there is no possible path defined on the routing table, gateway drops the packet at that point.
@@ -62,7 +62,7 @@ It simply cannot figure out where to forward the packet, so it decides to not fo
 So, as we can see, it's pretty important to have our routing tables as up to date as possible.
 There are a couple of ways to update the routing table, so let's take a small detour again to discuss them:
 
-### <a id='static-routing'></> Static Routing
+### <a id='static-routing'/> Static Routing
 
 The simplest way we can update our routing tables is by through what is called _static routing_.
 Static in this context means manually configuring all of our router's routing tables whenever we have a change on our network.
@@ -70,7 +70,7 @@ As you can imagine, static routing is simple but since it is manual, the amount 
 
 Of course - if we have a static way of configuring our routing tables, we can guess we have a _dynamic_ way of configuring as well.
 
-### <a id='dynamic-routing'></> Dynamic Routing
+### <a id='dynamic-routing'/> Dynamic Routing
 
 Dynamic routing is a way of updating our gateway configuration _automatically_ by using _dynamic routing protocols_ and neighboring gateways.
 There are different branches of _routing protocols_ called _Interior Gateway Protocols (IGPs)_ and _Exterior Gateway Protocols (EGPs)_.
@@ -104,7 +104,7 @@ If the perfomance of two routes are the same, our gateway simply _load balances_
 
 Now that we have discussed how the routing table of our gateway is configured, we can continue with our analysis.
 
-## <a id='public-private-ip-addresses'></> Public/Private IP Addresses
+## <a id='public-private-ip-addresses'/> Public/Private IP Addresses
 
 We are at the point where our gateway selects the most performant path from its routing table, and ready to forward the packet.
 Before moving on though, it needs to do one more critical task.
@@ -129,7 +129,7 @@ Or is it?
 
 And at this point, we uncover another important concept about routing, which is _Network Address Translation (NAT)_.
 
-## <a id='network-address-translation-nat'></> Network Address Translation (NAT)
+## <a id='network-address-translation-nat'/> Network Address Translation (NAT)
 
 NAT is a concept that is used to _map private IP addresses to public IP addresses_, so that hosts with private IP addresses can send packets to the public, and vice versa.
 Without NAT, we wouldn't be able to connect to a remote network from our home networks or private networks administrated by companies would have no access to public networks.
@@ -172,7 +172,7 @@ By utilizing ports, even if NAT uses only one public IP address, it knows how to
 
 Now we know how our private host sends packets: _our gateway uses NAT to make the address routable_.
 
-## <a id='summary'></> Summary
+## <a id='summary'/> Summary
 
 We covered a lot in this part of the analysis - let's summarize the outcomes:
 
