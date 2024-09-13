@@ -48,7 +48,7 @@ PS: The MAC address of the host (named `ether` in the output) is masked for secu
 
 ---
 
-## <a id='wap-wireless-access-point'></> WAP (Wireless Access Point)
+## <a id='wap-wireless-access-point' /> WAP (Wireless Access Point)
 
 A WAP is a device that allows wireless devices to connect to a wired network.
 This device is frequently used in home networks (also called modems).
