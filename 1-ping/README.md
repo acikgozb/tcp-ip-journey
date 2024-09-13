@@ -431,9 +431,9 @@ This is a quite good start, but there is a missing piece that is really, really 
 Our test host simply does not float on the Internet, it is specifically connected to a local network. So that network **has to have an IP address** as well.
 Remember, the thing that we are trying to understand is this:
 
-Given that there are 2 IP addresses `192.168.1.101` and `172.207.169.206`, do these addresses belong to the same network or not?
+Given that there are 2 IP addresses `192.168.1.101` and `172.217.169.206`, do these addresses belong to the same network or not?
 
-In order to answer this question, we need to find our local network's IP address. If `172.207.169.206` is an address that is _inside_ our local network, we can say that it belongs to it. If not, then we can safely say that it is an address that lives on a remote network.
+In order to answer this question, we need to find our local network's IP address. If `172.217.169.206` is an address that is _inside_ our local network, we can say that it belongs to it. If not, then we can safely say that it is an address that lives on a remote network.
 
 And here's the news - we can "guess" that they are on a different network, but there is a wonderful way to verify it.
 Before jumping straight to the answer though, let's take a detour first.
@@ -579,10 +579,10 @@ If you want to practice the calculations, you can visit this [website](https://s
 Now that we found out that our local network address is `192.168.1.0`, we can answer the question.
 The question was:
 
-_Given that there are 2 IP addresses `192.168.1.101` and `172.207.169.206`, do these addresses belong to the same network or not?_
+_Given that there are 2 IP addresses `192.168.1.101` and `172.217.169.206`, do these addresses belong to the same network or not?_
 
 With the help of our subnet mask, we can see that these IP addresses truly belong to different networks.
-For our test host to communicate with `172.207.169.206`, it really needs to go over the Internet.
+For our test host to communicate with `172.217.169.206`, it really needs to go over the Internet.
 
 ### Summary
 
@@ -601,7 +601,7 @@ Like I said, it's getting better and better on each section.
 Here is a recap of the things we have discovered so far:
 
 - Our `ping` uses a DNS server to understand the IP address of `google.com`,
-- By analyzing the configured subnet mask `255.255.255.0` of our host `192.168.1.101`, we understood that the destination IP address `172.207.169.206` lives on a remote network.
+- By analyzing the configured subnet mask `255.255.255.0` of our host `192.168.1.101`, we understood that the destination IP address `172.217.169.206` lives on a remote network.
 - So the ICMP packet created by `ping` needs to go over the Internet to reach that IP address.
 
 In this section, we will talk about the first part that our ICMP packet goes through in its journey.
@@ -799,7 +799,7 @@ So, here is a quick rundown of these steps:
 3 - Once frames are generated on our gateway, L2 checks the Ether-field values of frames, and sees that the main protocol that handles these frames on L3 is IP. So L2 forwards the frames to L3, and IP extracts the packet from the frames.
 
 Now we are at the L3 in our test gateway. So, the very first thing that the gateway does is to check the destination address of the packet.
-Remember that the packet created by `ping` contains `google.com`'s IP address: `172.207.169.206`.
+Remember that the packet created by `ping` contains `google.com`'s IP address: `172.217.169.206`.
 
 Now that it has the destination address, it tries to _determine the most performant path_ for the packet.
 And here comes another important concept that we encounter frequently, a gateway determines the path by looking at its _routing table_.
@@ -947,3 +947,145 @@ Is the journey completed though?
 As you might guess, there is still quite a bit to analyze, so let's move on the third part of the journey.
 
 ## Step 6: The Journey of a Packet - Part 3 (Hops)
+
+We left the journey at our gateway, which picked up the analog radio signals from our host and eventually extracted the given packet.
+It checked its own routing table to determine the best path for the given destination IP address.
+Once the path is determined, it proceeded to forward the packet.
+
+However, by determining the path, it brought us some questions along with it:
+
+- Can we see the path that `ping` takes?
+- Is it a path that straight goes to the remote host, or is it something else?
+
+Thus, let's analyze the given path to answer these questions.
+
+### The Determined Path
+
+Like it is mentioned in previous section, our gateway chooses a path by checking its routing table.
+The routing table is mostly updated by _dynamic routing protocols_ with the help of _neighboring routers_.
+Therefore, we can say that the routing table of our gateway has:
+
+- Updates coming from **other gateways**,
+- Records associated with what is connected to **its own interfaces**,
+- Records that are **statically configured** (not every record has to be dynamic).
+
+Based on this information, we can say that:
+
+- If the destination IP address belongs to one of the networks that is connected to its interface, then it is a path that _goes straight to the destination network_.
+- If the destination IP address belongs to either static or dynamic records, then we can't say for certain that path goes straight to the destination network.
+
+To fully answer our first question, we can utilize a perfect tool called `traceroute`.
+
+### `traceroute`
+
+`traceroute` is a tool similar to `ping` that uses ICMP packets to understand the path of a packet.
+`traceroute` specifically uses UDP and the _TTL_ attribute of ICMP to record the location of a packet.
+ICMP's "TTL Exceeded" message is listened by UDP probes and when TTL value expires on a gateway, an error message is directly returned to `traceroute`.
+`traceroute` then understands that at that specific gateway the TTL is exceeded, therefore it records the gateway, increases the value of TTL by 1 and then transmits another ICMP packet, and this process is executed recursively until the packet is reached to a host.
+
+Time to see the tool in action.
+First, let's use it to see the path to our gateway from our local network.
+Remember, the IP address of our gateway is `192.168.1.1`:
+
+```bash
+traceroute 192.168.1.1
+
+# traceroute to 192.168.1.1 (192.168.1.1), 64 hops max, 52 byte packets
+# 1  192.168.1.1 (192.168.1.1)  6.853 ms  2.236 ms  2.844 ms
+```
+
+As you probably guessed, since our gateway lives on the local test network, the output shows that there is no "intermediate" network on the path itself.
+This was an easy one.
+
+Let's see what happens when we use `traceroute` for `google.com`. Remember, our destination IP address is `172.217.169.206`:
+
+```bash
+traceroute 172.217.169.206
+
+# traceroute to 172.217.169.206 (172.217.169.206), 64 hops max, 52 byte packets
+# 1  192.168.1.1 (192.168.1.1)  6.853 ms  2.236 ms  2.844 ms
+# 2  172.17.1.111  5.099 ms  8.908 ms  4.802 ms
+# 3  * 31.223.39.161  12.556 ms  *
+# 4  159.146.100.66  10.083 ms  5.614 ms  5.205 ms
+# 5  31.223.39.157  8.217 ms  *  23.588 ms
+# 6  95.70.195.41  18.809 ms  19.506 ms  19.353 ms
+# 7  193.192.105.114  14.427 ms  17.518 ms  14.277 ms
+# 8  192.192.105.113  17.601 ms  14.923 ms  2.844 ms
+# 9  * * *
+# 10 142.251.52.82 22.145 ms
+#    142.250.212.22 14.922 ms
+#    142.251.236.33 15.840 ms
+# 11  108.170.236.33  17.587 ms
+#     192.178.108.44 18.025 ms 15.529 ms
+# 12  172.217.169.206  16.848 ms 14.655 ms
+```
+
+Holy %\*#$!
+That's a lot of IP addresses right there.
+From this output, we can see the path of the ICMP packet created by `traceroute`.
+There are a couple of interesting things on the output above, so let's analyze this path.
+
+---
+
+PS: The output of `traceroute` shows the path of its own ICMP packet.
+This does not mean that every single connection to `google.com` will go through the same path (including the `ping` that we have been analysing).
+Remember, gateways may choose different paths from their routing tables based on the incoming updates and their AD values. Thus, if you try `traceroute`, you may see a different path.
+
+---
+
+### Hops
+
+If we check the output, the very first thing we notice is the amount of IP addresses we have compared to the first example.
+The first IP address is our gateway's IP address, and the last one is the destination IP address.
+
+The IP addresses in between are commonly called _hops_ and each of them represent a _gateway along the path_.
+Basically, our ICMP packet hops betweeen different gateways around the world until it reaches its destination host.
+
+Another interesting thing on our output is the asterisks.
+If you check the output again, we have asterisks for our 9th gateway.
+This can mean two things:
+
+- That gateway may have been configured to not throw ICMP "TTL Exceeded" errors.
+- The returning ICMP error packets from 9th gateway may have too little TTL values that makes it not reach to our host.
+
+If we had the administration of that gateway, we would be able to understand the exact reason.
+
+The last interesting thing on our output is really subtle - it is the fact that our third gateway has _an private IP address_ associated with it.
+We just talked about private IP addresses being non-routable - so how is this possible?
+
+To understand this, let's take a closer look at how `traceroute` prints a gateway:
+
+- Based on the hops, `traceroute` sets the TTL values of ICMP packets (e.g TTL=1 for first hop, 2 for second, and so on),
+- When TTL is expired on a certain router, it returns an ICMP error packet back to the source host, **assigning its IP address as source address**.
+- If the error packet manages to reach back to our host, `traceroute` sees that an error occured from a new location, thus it extracts the source IP address from that error packet and prints it with other metrics.
+
+Now, the reason why we see a private IP address is because the ICMP error packet actually comes from **a private gateway in a remote network**, and since it does not have a public IP address, it puts its private IP address instead.
+
+---
+
+PS: A private gateway in this context means a gateway that is responsible from connecting private networks via its routing table.
+
+---
+
+This is actually expected when it comes to gateways managed by ISPs.
+ISPs have huge networks and if every gateway in those networks had a public IP address, we would run out of available IP addresses way sooner.
+
+This is why the third gateway is pretty interesting, it basically tells us that **the path that goes to google.com contains a private network**.
+
+### Summary
+
+In this section, we added one new tool called `traceroute` to our analysis to understand the path of our ICMP packet starting from our gateway to the destination itself.
+Remember, these were our questions:
+
+- Can we see the path that `ping` takes?
+- Is it a path that straight goes to the remote host, or is it something else?
+
+Based on the output from `traceroute`, we can say that:
+
+- We can see a possible path that goes to `google.com`, but the actual path that `ping` takes may vary based on the performance of the different paths at that time.
+- The path that goes to `google.com` consists of many different gateways around the world - it's not a path that goes straight without any gateways in between.
+
+We almost completed the first part of our analysis.
+Now comes the second part - the ICMP Echo reply packet which is generated at the destination host.
+
+## Step 7: Here Comes the ICMP Response
