@@ -1,7 +1,12 @@
 # Study 1: `ping` Over a Remote Network
 
 This study contains an analysis of `ping`, a tool that is commonly used to test connections to hosts.
-It focuses on pinging `google.com`, which is a commonly known remote network.
+It focuses on pinging `google.com`, which is a well-known website.
+
+First of all, I would like to thank you for checking it out.
+I tried to make it as intriguing as possible without going too much into details.
+I was curious about the way `ping` works whilst studying networking, thus I wanted to write an analysis about it to reinforce my understanding.
+Since it is a tool that is frequently used, I thought it would be a nice topic to discuss.
 
 ## What is `ping`?
 
@@ -16,6 +21,12 @@ ICMP is mainly used to understand the `state` of the transmitted packet. Based o
 - `Time-to-live Exceeded (TTL)`
 - `Destination Unreachable`
 - `Request Timed Out`
+
+---
+
+PS: ICMP being on L3 does not make `ping` a L3 application. `ping` works at L4 (Application Layer) of TCP/IP model.
+
+---
 
 Using `ping` is pretty straightforward. Here is an example call that will be analyzed:
 
@@ -173,7 +184,7 @@ Based on the implementation, it can leverage both of the **L4 (Transport layer) 
 So now we know that to resolve `google.com`, we need to send a DNS query to a DNS server via TCP/UDP by specifically using the port 53.
 But which DNS server should we send the query?
 
-#### Step 1: The Configured DNS Server
+#### The Configured DNS Server
 
 Here comes another important point about DNS, there are _tons_ of DNS servers around the world, and there is a specific order of execution happening once a DNS query is sent from a host.
 
@@ -250,7 +261,7 @@ In the WAP section, I told that the example WAP was configured as a gateway (rou
 
 Now that we found our DNS server, now it's time to do the actual name resolution.
 
-#### Step 2: Recursive Resolutions
+#### Recursive Resolutions
 
 As I mentioned above, there are a _ton_ of DNS servers around the world.
 So we can make a guess that our DNS server located at `192.168.1.1` probably does not know every single IP address out on the Internet.
@@ -957,7 +968,7 @@ However, by determining the path, it brought us some questions along with it:
 - Can we see the path that `ping` takes?
 - Is it a path that straight goes to the remote host, or is it something else?
 
-Thus, let's analyze the given path to answer these questions.
+Thus, let's analyze the path to answer these questions.
 
 ### The Determined Path
 
@@ -979,9 +990,9 @@ To fully answer our first question, we can utilize a perfect tool called `tracer
 ### `traceroute`
 
 `traceroute` is a tool similar to `ping` that uses ICMP packets to understand the path of a packet.
-`traceroute` specifically uses UDP and the _TTL_ attribute of ICMP to record the location of a packet.
+`traceroute` specifically uses _UDP_ and the _TTL_ attribute of ICMP to record the location of a packet.
 ICMP's "TTL Exceeded" message is listened by UDP probes and when TTL value expires on a gateway, an error message is directly returned to `traceroute`.
-`traceroute` then understands that at that specific gateway the TTL is exceeded, therefore it records the gateway, increases the value of TTL by 1 and then transmits another ICMP packet, and this process is executed recursively until the packet is reached to a host.
+It then understands that at that specific gateway the TTL is exceeded, therefore it records the gateway, increases the value of TTL by 1 and then transmits another ICMP packet, and this process is executed recursively until the packet is reached to a host.
 
 Time to see the tool in action.
 First, let's use it to see the path to our gateway from our local network.
@@ -994,7 +1005,8 @@ traceroute 192.168.1.1
 # 1  192.168.1.1 (192.168.1.1)  6.853 ms  2.236 ms  2.844 ms
 ```
 
-As you probably guessed, since our gateway lives on the local test network, the output shows that there is no "intermediate" network on the path itself.
+As you probably guessed, since our gateway lives on the local test network, the given path does not have any "intermediate gateways.
+The packet straight goes to the gateway.
 This was an easy one.
 
 Let's see what happens when we use `traceroute` for `google.com`. Remember, our destination IP address is `172.217.169.206`:
@@ -1020,9 +1032,7 @@ traceroute 172.217.169.206
 # 12  172.217.169.206  16.848 ms 14.655 ms
 ```
 
-Holy %\*#$!
-That's a lot of IP addresses right there.
-From this output, we can see the path of the ICMP packet created by `traceroute`.
+Wow, that's a lot of IP addresses right there.
 There are a couple of interesting things on the output above, so let's analyze this path.
 
 ---
@@ -1046,7 +1056,7 @@ If you check the output again, we have asterisks for our 9th gateway.
 This can mean two things:
 
 - That gateway may have been configured to not throw ICMP "TTL Exceeded" errors.
-- The returning ICMP error packets from 9th gateway may have too little TTL values that makes it not reach to our host.
+- The returning ICMP error packets from 9th gateway may have too little TTL values that makes it not reach back to our host.
 
 If we had the administration of that gateway, we would be able to understand the exact reason.
 
@@ -1089,3 +1099,81 @@ We almost completed the first part of our analysis.
 Now comes the second part - the ICMP Echo reply packet which is generated at the destination host.
 
 ## Step 7: Here Comes the ICMP Response
+
+Let's sum up where are we at in this analysis:
+
+- The ICMP packet created by `ping` is sent to the local gateway from our test host.
+- The local gateway chose the most appropriate path to `google.com`, and the packet was transmitted along that path.
+
+Now, remember that the last line of our `traceroute` output was our destination IP address.
+So, we can say that the _digital signals_ are transmitted to our destination host successfully.
+
+---
+
+PS: Here is a reminder - the physical path of a packet is the responsiblity of L1 (Physical) and L2 (Data Link), thus the destination host first needs to extract the packet from digital signals.
+
+---
+
+So, at this point, here are steps from L1 to L3 on our destination host:
+
+- L1 takes the digital signals and forwards it to L2.
+- L2 extracts frames from digital signals, and it also runs a FCS (Frame Check Sequence) to see whether the data integrity is preserved.
+- L2 sees that the Ether-field header value is IP, so it forwards to IP at L3.
+- IP extracts the packet from frames, and checks the destination IP address.
+- Once the destination address matches with our destination host's IP address, IP checks the Protocol field and sees that ICMP is responsible from creating this packet.
+- IP forwards the packet to ICMP.
+
+As you can see, these steps are the exact same steps our gateway used when it received an analog signal from our host.
+
+Here is the part that is different - once ICMP gets the packet from our source host, it sees that it is a Echo packet, and prepares an Echo response packet to answer our host.
+At this point, we are back to L3 on our destination host.
+This time, the source IP address of the ICMP Echo response packet is actually _our destination address_ `172.217.169.206`, because `google.com` will transmit a packet back to our test host.
+But what about the destination IP address?
+
+Remember that our host address `192.168.1.101` is a private IP address, and it is not routable.
+To make our packet routable, our gateway translated the private IP address into a public IP address by utilizing NAT.
+When we look at the perspective from the destination host, it only knows a packet that was transmitted from that public IP address.
+Therefore, the destination host uses the exact same public IP address as it's destination IP address.
+
+To understand the differences clearly, here is a visual representation of the packets we use:
+
+| Packet Type        | Created By      | Source IP Address                | Destination IP Address           |
+| ------------------ | --------------- | -------------------------------- | -------------------------------- |
+| ICMP Echo Request  | `192.168.1.101` | the translated public IP address | `172.217.169.206`                |
+| ICMP Echo Response | `google.com`    | `172.217.169.206`                | the translated public IP address |
+
+From here until the response packet hits our gateway - the steps are pretty much the same.
+
+---
+
+PS: Since the exact configuration of `google.com` is not as simple as our test network and more or less unknown, at this point of the analysis it is not practical to go further into detail.
+Google uses a cluster of servers, and utilizes different concepts to deal with the incoming traffic.
+However, communication wise, it is exactly the same - our host lives on a remote network from Google's perspective, so regardless of the configuration they have, one of their gateways gets the ICMP response packet and transmits it by using the most performant path.
+
+---
+
+## Step 8: The Journey Ends Here
+
+Unfortunately, we are coming to the end of our analysis, and this section is not as exciting as previous ones due to the fact that the same concepts are used on our way back.
+So, let's quickly take a look at what happens when the ICMP response hits our gateway:
+
+- The process between L1 and L3 of our gateway is again the same - the digital signals are eventually converted into a packet that L3 can process.
+- L3 IP checks the destination IP address of the response and re-translates it back to our host's private IP address by looking on its _translation table_.
+- Once the private IP address is determined, our gateway understands that it is a host that lives on the same network - so it uses either its own ARP table or sends an ARP broadcast message to get the MAC address of our host.
+- With the MAC address in hand, the same steps are taken for L3 -> L1 on our gateway, and the analog radio signals are sent for out host at the end.
+
+And here is the last part on our host:
+
+- Analog radio signals are picked up by L1, demodularized into digital signals, and forwarded to L2.
+- L2 extracts frames from signals, runs it's own FCS to check the data integrity.
+- L2 hands the frames over to L3 IP, and the packet is extracted from frames.
+- IP checks the destination address and understands that the packet belongs to the host itself.
+- IP hands over to ICMP (by looking at the Protocol header value) and ICMP understands that this is an Echo response coming from `google.com`.
+- At the end, `ping` reads the ICMP response and outputs it to stdout (by default).
+
+Like I said, there is nothing new on this section, but we had to take a look at the response as well to see the whole picture.
+
+With that said, we can conclude our analysis.
+I would like to encourage you to try all the commands that are used in here.
+If you want to dive even deeper, I would recommend installing [Wireshark](https://www.wireshark.org/) to analyze your own network.
+It is a popular package analyzer tool and it is what I have been using throughout my own networking journey.
