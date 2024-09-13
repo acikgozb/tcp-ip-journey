@@ -13,10 +13,10 @@ Since it is a tool that is frequently used, I thought it would be a nice topic t
 Like it is mentioned above, `ping` is a Unix tool that is used to test a connection to a host.
 
 One of the important things about `ping` is that it uses _Internet Control Management Protocol_ (ICMP) packets to test the connection.
-This protocol lives on L3 of the _TCP/IP_ model (Network/Internet Layer), which allows our analysis to focus purely on the connection, unlike L7 protocols such as _HTTP/HTTPS_ or _FTP/SFTP/TFTP_.
-Since ICMP lives on L3, it does not use TCP or UDP to function. It is encapsulated in a IPv4 packet.
+This protocol lives on L3 of the _TCP/IP_ model (Network/Internet Layer), which allows our analysis to focus purely on the connection, unlike L7 protocols such as _HTTP/HTTPS_ or _FTP_.
+Since ICMP lives on L3, it does not use _TCP_ or _UDP_ to function. It is encapsulated in a _IPv4_ packet.
 
-ICMP is mainly used to understand the `state` of the transmitted packet. Based on the status of the remote location, ICMP can return messages like:
+ICMP is mainly used to understand the _state_ of the transmitted packet. Based on the status of the remote location, ICMP can return messages like:
 
 - `Time-to-live Exceeded (TTL)`
 - `Destination Unreachable`
@@ -86,7 +86,7 @@ In this "test" network, there are 2 main devices that is responsible from the co
 
 ### NIC (Network Interface Card)
 
-A NIC is a piece of hardware that connects a device to a network. NICs are mostly found in computers, servers and routers.
+A NIC is a piece of hardware that connects a device to a network. NICs are mostly found in personal computers, servers and routers.
 
 In this example, the test computer uses its integrated NIC to connect to the wireless home network. As a result, there is an interface on the computer that we can analyze by using `ifconfig`:
 
@@ -97,7 +97,7 @@ ifconfig en0
 
 # en0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
 # 	options=400<CHANNEL_IO>
-# 	ether 6c:xx:xx:xx:xx:a6
+# 	ether xx:xx:xx:xx:xx:xx
 # 	inet6 fe80::899:c1a1:7014:1413%en0 prefixlen 64 secured scopeid 0xf
 # 	inet 192.168.1.101 netmask 0xffffff00 broadcast 192.168.1.255
 # 	nd6 options=201<PERFORMNUD,DAD>
@@ -109,7 +109,11 @@ In our test, `en0` interface of the host is used for any communication through t
 
 The output of `ifconfig en0` tells us many things but for the scope of the analysis, we will focus on `ether`, `inet`, `broadcast` fields in the further sections.
 
+---
+
 PS: The MAC address of the host (named `ether` in the output) is masked for security purposes.
+
+---
 
 ### WAP (Wireless Access Point)
 
@@ -117,9 +121,13 @@ A WAP is a device that allows wireless devices to connect to a wired network.
 This device is frequently used in home networks (also called modems).
 
 Other than connecting wireless devices, it can also have other functions based on how it is configured.
-The WAP on the example is used (given by the ISP) as a gateway (router) and a DNS server.
+The WAP on the example (given by the ISP) is used as a gateway (router) and a DNS server.
 
-_PS: Remember that in a wireless network the main way to communicate is by sending analog radio signals. These signals are modulated from digital signals in L1 (Physical Layer), and demodulated once they are transmitted to another station. This is why the name "modem" can also be used for WAP's._
+---
+
+PS: Remember that in a wireless network the main way to communicate is by _sending analog radio signals_. These signals are modulated from digital signals in L1 (Physical Layer), and demodulated once they are transmitted to another station. This is why the name "modem" can also be used for WAP's.
+
+---
 
 ### Summary
 
@@ -133,7 +141,7 @@ As we progress through, the terms "gateway" and "DNS server" will be more clear.
 
 ## Step 2: DNS Is Only For Humans
 
-Lets check our ping to `google.com` again. Throughout the analysis, I will frequently refer to it:
+Let's check our ping to `google.com` again. Throughout the analysis, I will frequently refer to it:
 
 ```bash
 ping -c1 google.com
@@ -147,19 +155,19 @@ ping -c1 google.com
 ```
 
 In this example, there is a subtle thing going on during the execution.
-If you check carefully, there is an _IP address_ next to `google.com`, which is defined as `172.217.169.206`. It seems like we are pinging to that IP address, not `google.com`.
-
-Or are we?
+If you check carefully, there is an _IP address_ next to `google.com`, which is defined as `172.217.169.206`. It seems like we are pinging to that IP address, not `google.com`. Or are we?
 
 Here comes the first "aha!" moment of the networking.
 
 IP address is the main concept that is used in networking to facilitate communication between devices.
-Internet Protocol sits on L3 of the TCP/IP model, and is the basis of the Internet itself.
-The domain names we use - _google.com, youtube.com, github.com, you name it_ - are just there for user convenience. The L3 devices we use for networking only understands IP addresses, they basically have no idea what `google.com` means.
-By "tagging" an IP address with a domain name, it provides us two things:
+Internet Protocol sits on L3 of the TCP/IP model, and is the basis of how we communicate between devices in today's world.
+The domain names we use - _google.com, youtube.com, github.com, you name it_ - are just there for user convenience.
+The L3 devices we use for networking only understands IP addresses, they basically have no idea what `google.com` means.
+By "mapping" an IP address with a domain name, it provides us many advantages.
+Here is a couple of them:
 
-- Users of a domain can reference it by using its domain name from now on (_google.com_), which is a lot easier to remember compared to memorizing its IP address (_172.217.169.206_).
-- By abstracting away the IP address, it creates a way of updating IP addresses freely, without disrupting users. Of course this scenario is not as easy as it sounds.
+- Users of a domain can reference it by using its domain name from now on (_google.com_), which is a lot easier compared to memorizing its IP address (_172.217.169.206_).
+- It abstracts away the IP address from the end user, which makes it a lot easier to administer networking devices.
 
 So going back to the example, `ping` actually does what it needs to do, it sends an ICMP packet to the IP address `172.217.169.206`, because it doesn't know what `google.com` is.
 However, how does it know that the IP address of `google.com` is actually `172.217.169.206`?
@@ -180,6 +188,12 @@ So, how does this "name resolution" actually work?
 Lets talk about DNS a little bit.
 DNS is a **L7 (Application Layer) Service** that allows us to find the IP address of a requested resource.
 Based on the implementation, it can leverage both of the **L4 (Transport layer) protocols TCP/UDP** and it's **well-defined port number is 53**.
+
+---
+
+PS: Please note that DNS is not only used for name resolution - it's just one of the features.
+
+---
 
 So now we know that to resolve `google.com`, we need to send a DNS query to a DNS server via TCP/UDP by specifically using the port 53.
 But which DNS server should we send the query?
@@ -214,7 +228,7 @@ As we can see, there are no records pointing to `google.com`, instead we have th
 - The host name `localhost` pointing the IP address `::1`. This is actually a _IPv6_ address, and it is a whole another world compared to _IPv4_ (or simply, IP).
 - The host name `broadcasthost` point to the IP address `255.255.255.255`. This is an alias IP address is used for broadcast messages, which will be explained in further sections.
 
-As a side info, `hosts` file is considered legacy and it is no longer the primary way of resolving domain names on the Internet.
+As a side info, `hosts` file is considered legacy and it is no longer the primary way of resolving domain names in today's networking.
 Therefore, in order to resolve `google.com`, the host actually sends a DNS query to a DNS server, but which one?
 
 There are different ways which you can use to locate your configured DNS server. Here is a couple of them:
@@ -249,8 +263,6 @@ As you can see, the DNS server can be reached on `192.168.1.1`.
 ipconfig getsummary en0
 
 # ...
-# server_identifier (ip): 192.168.1.1
-# subnet_mask (ip): 255.255.255.0
 # router (ip_mult): {192.168.1.1}
 # domain_name_server (ip_mult): {192.168.1.1}
 # ...
@@ -265,7 +277,7 @@ Now that we found our DNS server, now it's time to do the actual name resolution
 
 As I mentioned above, there are a _ton_ of DNS servers around the world.
 So we can make a guess that our DNS server located at `192.168.1.1` probably does not know every single IP address out on the Internet.
-Nonetheless, it's responsibility is to provide IP address to any host in the test network, which is `192.168.1.0`.
+Nonetheless, it's responsibility is to provide IP address to any host in the test network.
 
 So, if our DNS server does not know every IP address, how does it retrieve the IP address of `google.com`, which is `172.217.169.206`?
 Here comes the next important thing about DNS, it is the fact that **a DNS server does its name resolution recursively**.
@@ -273,7 +285,9 @@ Here comes the next important thing about DNS, it is the fact that **a DNS serve
 So, what does recursion mean in this context?
 
 It means that if a DNS server cannot provide name resolution for a domain name, it goes and searches other DNS servers around the world to provide that information!
-But does a DNS server randomly send DNS queries to other servers? As you probably guessed, it does not. There is a specific order of execution happening during this recursive operation.
+But does a DNS server randomly send DNS queries to other servers?
+As you probably guessed, it does not.
+There is a specific order of execution happening during this recursive operation.
 
 Here is a rundown of how recursion works for `google.com`:
 
@@ -373,17 +387,21 @@ dig google.com +trace
 
 In this trace output, we first see NS (nameserver) records, which are records that point a server that may hold the information.
 `dig` uses these servers to search for `google.com`.
-Starting from the root servers, `dig` is eventually pointed to the DNS servers of Google (`ns1` through `ns4`), and then one of those servers respond with the A record at the end, which contains the IP address.
+Starting from the root servers, `dig` is eventually pointed to the DNS servers of Google (`ns1.google.com` through `ns4.google.com`), and then one of those servers responds with the A record at the end, which contains the IP address.
 
 As we can see from this output `+trace` option is useful to troubleshoot any DNS issues, or to verify the name resolution process.
 
+---
+
 PS: There are actually quite a bit of record types (A, AAAA, PTR, NS, MX, CNAME, ...), but for our analysis, only NS and A records are examined.
+
+---
 
 ### Summary
 
 Here is what has discussed in this part of the analysis:
 
-- The process of mapping `google.com` to `172.217.169.206` during our example `ping`.
+- The process of mapping `google.com` to `172.217.169.206` during `ping`.
 - The importance of DNS, it's place on the TCP/IP layers.
 - The name resolution process which is used pretty much anywhere on the Internet.
 
@@ -412,7 +430,8 @@ We also know that our `ping` successfully transmits a packet to `google.com`.
 Here comes the next question - is the IP address `172.217.169.206` points to a remote host or is it actually a host on our test network?
 In other words, does `ping` actually goes out on the Internet or does it stay in the local network?
 Since the destination is `google.com`, we can guess the answer - it is a remote host.
-But can we see this clearly? How can we make sure that an IP address points a local or remote network?
+But can we see this clearly?
+How can we make sure that an IP address points a local or remote network?
 
 And here comes another vital point of TCP/IP - the "network" and "host" bits of an IP address.
 
@@ -430,7 +449,8 @@ Here is a visual representation of these ranges:
 In previous sections, we saw the NIC configuration of the test host, and we know that the configuration contains an IP address associated with the active interface `en0`.
 That IP address is the starting point of our journey, in other words, it is the _source IP address_ that is used to sent an ICMP packet by `ping`.
 
-Let's see that IP address again. This time, I will use `ipconfig` in a different way to specifically get the IP address:
+Let's see that IP address again.
+This time, I will use `ipconfig` in a different way to specifically get the IP address:
 
 ```bash
 ipconfig getifaddr en0
@@ -444,7 +464,9 @@ Remember, the thing that we are trying to understand is this:
 
 Given that there are 2 IP addresses `192.168.1.101` and `172.217.169.206`, do these addresses belong to the same network or not?
 
-In order to answer this question, we need to find our local network's IP address. If `172.217.169.206` is an address that is _inside_ our local network, we can say that it belongs to it. If not, then we can safely say that it is an address that lives on a remote network.
+In order to answer this question, we need to find our local network's IP address.
+If `172.217.169.206` is an address that is _inside_ our local network, we can say that it belongs to it.
+If not, then we can safely say that it is an address that lives on a remote network.
 
 And here's the news - we can "guess" that they are on a different network, but there is a wonderful way to verify it.
 Before jumping straight to the answer though, let's take a detour first.
@@ -453,8 +475,8 @@ Before jumping straight to the answer though, let's take a detour first.
 
 This detour is important because we need to see what happened in the past to understand the "why" of the networking concepts we frequently use in today's networking.
 At first, a _classful_ system is designed for IP to specify network addresses and available host addresses for each network.
-What I mean by _classful_ is that certain ranges of IP addresses were tied into a specific class.
-Here is the list of classes:
+What I mean by _classful_ is that certain ranges of IP addresses were tied into classes.
+Here is the list of them:
 
 - Class A: `0.0.0.0` through `127.255.255.255`
 - Class B: `128.0.0.0` through `191.255.255.255`
@@ -467,13 +489,13 @@ So for example, if we see an IP address like `10.5.2.240`, based on the classful
 This system had worked well for a while but unfortunately due to the fact that there is a maximum limit of IP addresses we can use (around 4.3 billion, even less when we subtract Class D and E, which are reserved IP pools), it started to cause some trouble:
 
 - In Class A and B networks, there is an abundance of IP addresses available to hosts, and most of these addresses were wasted.
-- On the other hand, in Class C networks, the available IP address for hosts were too small so most companies could not fully benefit from it.
+- On the other hand, in Class C networks, the available IP address for hosts were too few so most companies could not fully benefit from them.
 
 Essentially, this system was using available IP address pool very inefficiently, so eventually it gave its place to another new concept, which is called _subnetting_.
 
 ---
 
-I want to point out that there are certain methods that are used in today's networking to counter the limitations of IPv4, and subnetting is one of those.
+PS: I want to point out that there are certain methods that are used in today's networking to counter the limitations of IPv4, and subnetting is one of those.
 However, the fact still remains - we have already run out of the available IP address pool.
 
 The thing that actually solves this limitation is _IPv6_, but that is not the scope of this analysis.
@@ -487,11 +509,10 @@ So, let's see what subnetting is and how it helps to answer our question.
 Before you continue reading, try to not think about the classful system we discussed above.
 The classful system is mentioned simply because we need to understand "why" there is a thing called subnetting.
 
-So, the problem is pretty obvious by now - we need a more efficient way to use IP. This is the primary thing that subnetting solves.
+So, the problem is pretty obvious by now - we need a more efficient way to use IP addresses.
+This is the primary thing that subnetting solves. But how?
 
-How?
-
-The logic behind subnetting is simple: Subnetting allows us to take a network, and create smaller networks from it.
+The logic behind subnetting is simple: Subnetting allows us to take a network, and create _smaller networks_ from it.
 By optimizing subnetting, we can achieve efficient IP addressing throughout our networks.
 
 ---
@@ -507,15 +528,17 @@ So, if we see an IP address of `192.168.1.1`, this IP address can mean two diffe
 - The IP address can be a host that lives in a network.
 
 Therefore, if subnetting is used, then we need to have a way to discover the actual network address of a given IP.
-And for this very reason, a _subnet mask_ is usually associated with a given IP address. So if you are given an IP address to analyze, most of the time you are provided with the subnet mask as well, like this:
+And for this very reason, a _subnet mask_ is usually associated with a given IP address.
+So if you are given an IP address to analyze, most of the time you are provided with the subnet mask as well, like this:
 
 - `192.168.1.1 255.255.255.0`
 - `192.168.1.1/24`
 
-Both of the notations above mean exactly the same thing. The 2nd notation is commonly known as _Classless Inter-Domain Routing (CIDR)_.
+Both of the notations above mean exactly the same thing.
+The 2nd notation is commonly known as _Classless Inter-Domain Routing (CIDR)_.
 So, let's see if our test host has its subnet mask configured.
 Remember how we checked the NIC configuration by both `ipconfig` and `ifconfig`?
-We can use those programs to find out our subnet mask as well.
+We can use those tools to find out our subnet mask as well.
 
 Here is our subnet mask with `ipconfig`, with its decimal representation:
 
@@ -523,11 +546,7 @@ Here is our subnet mask with `ipconfig`, with its decimal representation:
 ipconfig getsummary en0
 
 # ...
-# server_identifier (ip): 192.168.1.1
-# lease_time (uint32): 0xe10
 # subnet_mask (ip): 255.255.255.0
-# router (ip_mult): {192.168.1.1}
-# domain_name_server (ip_mult): {192.168.1.1}
 # ...
 ```
 
@@ -552,8 +571,10 @@ So here is one way of doing it:
 11111111   11111111    11111111    00000000
 ```
 
-In here, the bits that are turned on (1) indicate the network address, and the bits that are turned off (0) indicate host addresses.
-By looking at this, we can say that for the IP address `192.168.1.101`, we are using 3 bytes for our network. Since we are using 3 bytes, the actual subnetting happens on the third byte, not the first or the second. That byte is the one we should focus.
+In here, the bits that are turned on (1) indicate the _network address_, and the bits that are turned off (0) indicate _host addresses_.
+By looking at this, we can say that for the IP address `192.168.1.101`, we are using 3 bytes for our network.
+Since we are using 3 bytes, the actual subnetting happens on the third byte, not the first or the second.
+That byte is the one we should focus.
 
 2 - In the third byte, we use all the bits to determine the subnets.
 If all bits are used for subnets, that means there are no bits available for hosts in the third byte.
@@ -562,7 +583,7 @@ This is commonly referred as the _block size_ of a subnet.
 
 3 - After determining the block size, we can start to see the subnets more clearly.
 Starting from zero, if we increment the third byte by the block size up until the last possible value (255), we get our subnets.
-So for the IP address `192.168.1.101` and the subnet mask `255.255.255.0`, here are the subnets:
+So for the subnet mask `255.255.255.0`, here are the subnets:
 
 - 192.168.0.0
 - 192.168.1.0
@@ -638,8 +659,6 @@ Here comes the next part we will discuss:
 
 So, what is a gateway?
 
-<hr>
-
 ### Gateway
 
 A gateway is a L3 networking device (commonly known as router) that connects 2 or more distinct networks.
@@ -648,7 +667,7 @@ However, there are key features that makes routers a _lot_ different than switch
 
 **Routers are responsible from the logical path of a packet, whereas switches are responsible from physical path of a packet.**
 
-The main way of communication for routers is through IP addresses. For switches, it is MAC addresses instead.
+The main way of communication for routers is through IP addresses. For switches, MAC addresses are used instead.
 
 **Routers by default, separate broadcast domains of two networks.**
 
@@ -660,6 +679,7 @@ If the domains are separated, that means a host in one broadcast domain cannot s
 A collision domain is a domain that enables the possibility of the messages coming from different hosts to _collide_, resulting in loss of transmission.
 Increasing the size of the collision domain increases the possibility of packet loss.
 There are prevention methods that are used to solve this problem, but the fact still remains.
+In order to not take a huge detour, these prevention methods are skipped in this analysis.
 
 **Routers are way more flexible and configurable than switches.**
 
@@ -670,13 +690,12 @@ There are many more differences but to keep you in the context I'll not dive too
 
 So, you can think of the gateway as the main entry/exit point of a network.
 If there is a packet that is destined for a remote network, it goes through the gateway of the source network.
-Likewise, when a packet arrives from a remote network, it has to go through the configured gateway.
+Likewise, when a packet arrives from a remote network, it has to go through the gateway first.
 
-Now that we understand gateways a little bit, we can continue with the journey.
+Now that we understand gateways a little bit, we can continue with the journey:
 
-<hr>
-
-5 - IP checks the configuration on our test host to find the gateway's IP address. Remember, we can use `ipconfig` to see the IP address of the gateway (router):
+5 - IP checks the configuration on our test host to find the gateway's IP address.
+Remember, we can use `ipconfig` to see the IP address of the gateway (router):
 
 ```bash
 ipconfig getsummary en0
@@ -689,19 +708,18 @@ ipconfig getsummary en0
 6 - Now that IP knows the gateway address, it can forward the ICMP packet to it.
 However, there is another thing unknown at this point, which is essential for IP and pretty much all Ethernet communcations to know before moving on with the transmission.
 
-<hr>
-
 ### MAC Address
 
 Up until this point, we mainly dealt with IP addresses, because we were analyzing the _logical path_ of the ICMP packet.
 However, there is also a _physical path_ of a packet that it actually needs to travel through.
 And for the physical path, instead of looking at IP addresses, we need to look at MAC addresses.
 
-A MAC address is a unique hexadecimal value that is determined by the manufacturer of a device. It is the primary concept that is used to communicate in L2 (Data Link layer).
+A MAC address is a unique hexadecimal value that is determined by the manufacturer of a device.
+It is the primary concept that is used to facilitate communication in L2 (Data Link layer).
 
 So, in order for our host to forward the packet to the gateway, it needs to know the gateway's MAC address.
 This MAC address will be used by L2 later on to initiate the transmission.
-IP itself cannot figure out the MAC address, but there is a wonderful protocol that is used just for this purpose, which is called _Address Resolution Protocol (ARP)_.
+IP itself cannot figure out the MAC address, but there is a protocol that is used just for this purpose which is called _Address Resolution Protocol (ARP)_.
 Essentially, by using ARP our host can ask the question below to the network:
 
 **Hey, I need the MAC address of `192.168.1.1`, please let me know when you get this message.**
@@ -714,7 +732,8 @@ Now, ARP is a L3 protocol, and same rules are applied to this protocol as well:
 
 ---
 
-PS: The broadcast address of a subnet is _the last available address of a subnet_, and it does not have to be 255. It depends on the subnet mask.
+PS: The broadcast address of a subnet is _the last available address of a subnet_, and it does not have to be 255.
+It depends on the given subnet mask.
 
 ---
 
@@ -756,18 +775,16 @@ If you want to delete the whole table, you can use:
 arp -da
 ```
 
-Now that we know about ARP and MAC addresses, we can continue with our journey.
-
-<hr>
+Now that we know about ARP and MAC addresses, we can continue with our journey:
 
 7 - ARP is used on the host to get the MAC address of the gateway.
 When the MAC address is retrieved, IP adds the address as destination MAC address to the packet. The source MAC address is the address of the host itself.
 
 8 - The packet is handed down to L2. L2 checks the MAC addresses, and then creates _frames_ from the packet.
-There is a small detail that we can talk about, and that is the `Ether-field` header of the frame. At the destination, the packet needs to be handed to IP to process, therefore the protocol is put into this field on each frame.
+There is a small detail that we can talk about, and that is the `EtherType` header of the frame. At the destination, the packet needs to be handed to IP to process, therefore the protocol is put into this field on each frame.
 
-9 - Other than specifying Ether-field, L2 also runs a Frame Check Sequence (FCS) on each frame and puts the output into it's Cyclic Redundancy Check (CRC) field.
-This field is used while collecting the frames on the destination device. The L2 of the destination device also runs a FCS and compares it with the CRC field. If both values are the same, it means the data integrity is preserved.
+9 - Other than specifying EtherType, L2 also runs a Cyclic Redundancy Check (CRC) on each frame and puts the output into the frame's Frame Check Sequence (FCS) field.
+This field is used while collecting the frames on the destination device. The L2 of the destination device also runs a CRC and compares it with the FCS field. If both values are the same, it means the data integrity is preserved.
 
 10 - L2 hands the frames to L1 (Physical layer) and then bits are sent through the physical medium. The physical medium of our test network is wireless, so analog radio signals are created from digital signals and those signals are transmitted to be picked up by the gateway.
 
@@ -778,7 +795,7 @@ To sum up, here is what has discussed on this section:
 - We discussed what a _router_ (gateway) is and how it is used in networking.
 - We discussed some of the differences between a _switch_ and a _router_.
 - We discussed about another important protocol called ARP, and talked about how MAC addresses are used to facilitate communcation between devices.
-- We discussed what happens in terms of TCP/IP layers, starting from L3 to L1.
+- We discussed what happens in `ping` in terms of TCP/IP layers, starting from L3 to L1.
 
 And with this section, we have completed our analysis of the first part of the journey - the path that our packet takes from our host to the gateway of our test network.
 
@@ -794,26 +811,33 @@ Here is a quick rundown of what we have gone through in our analysis so far:
 - In order to physically move the packet to the gateway, L3 ARP is used to get the MAC address, then the packet is sent down to L2 to start the transmission.
 - L2 creates frames from the packet, and forwards it to L1 (Physical) to transmit the frames via the configured physical medium (wireless).
 
+---
+
+PS: For DNS name resolution, the same process happens for L3 and below.
+Since DNS is discussed before the layers, I decided explain the process in there.
+
+---
+
 Now, we are at the point where the analog radio signals are received by the gateway.
 This section will cover exactly what happens on the gateway.
 
 Gateways (routers) are responsible from _determining the best path to a remote network_, and they do this by analyzing the destination IP address.
 However, our gateway just received the analog radio signals, so we are at L1.
-We need to go our way up to L3 first, before analyzing how gateways determine the best possible path.
+We need to go our way up to L3 first, before analyzing how it determines the best possible path.
 Basically, to get to L3, our gateway has to extract the packet from analog radio signals, and it does this by reversing the steps that were done on our host.
 So, here is a quick rundown of these steps:
 
 1 - L1 on gateway demodulates the received analog radio signals and creates digital signals from them.
 
-2 - These signals are sent to L2, and L2 creates frames from the signals. In here, gateway runs the Frame Check Sequence for each frame, and compares it with the generated frame's CRC field. Remember, if both values match, that means the data integrity of the transmitted frames from our host are preserved.
+2 - These signals are sent to L2, and L2 creates frames from the signals. In here, gateway runs the CRC for each frame, and compares it with the generated frame's FCS field. Remember, if both values match, that means the data integrity of the transmitted frames from our host are preserved.
 
-3 - Once frames are generated on our gateway, L2 checks the Ether-field values of frames, and sees that the main protocol that handles these frames on L3 is IP. So L2 forwards the frames to L3, and IP extracts the packet from the frames.
+3 - Once frames are generated on our gateway, L2 checks the EtherType values of frames, and sees that the main protocol that handles these frames on L3 is IP. So L2 forwards the frames to L3, and IP extracts the packet from the frames.
 
 Now we are at the L3 in our test gateway. So, the very first thing that the gateway does is to check the destination address of the packet.
 Remember that the packet created by `ping` contains `google.com`'s IP address: `172.217.169.206`.
 
 Now that it has the destination address, it tries to _determine the most performant path_ for the packet.
-And here comes another important concept that we encounter frequently, a gateway determines the path by looking at its _routing table_.
+And here comes another important concept that we encounter frequently - a gateway determines the path by looking at its _routing table_.
 
 So, let's see what this _routing table_ is.
 
@@ -824,9 +848,7 @@ In other words, if there is no possible path defined on the routing table, gatew
 It simply cannot figure out where to forward the packet, so it decides to not forward it altogether.
 
 So, as we can see, it's pretty important to have our routing tables as up to date as possible.
-There are a couple of ways to update the routing table, so let's look at them:
-
----
+There are a couple of ways to update the routing table, so let's take a small detour again to discuss them:
 
 #### Static Routing
 
@@ -834,7 +856,7 @@ The simplest way we can update our routing tables is by through what is called _
 Static in this context means manually configuring all of our router's routing tables whenever we have a change on our network.
 As you can imagine, static routing is simple but since it is manual, the amount of work we need to do may quickly evolve to something we cannot maintain - based on the number of routers and network changes we have.
 
-Of course - if we have a static way of configuring our routing tables, we have a _dynamic_ way of configuring as well.
+Of course - if we have a static way of configuring our routing tables, we can guess we have a _dynamic_ way of configuring as well.
 
 #### Dynamic Routing
 
@@ -844,7 +866,9 @@ There are different branches of _routing protocols_ called _Interior Gateway Pro
 IGPs contain 3 different groups in it which are called _Distance Vector (DV)_, _Link State (LS)_, and Hybrid (mix of both).
 In the EGP part, the main routing protocol that is used is _Border Gateway Protocol (BGP)_
 
-The protocols in each group would take a whole another analysis to cover, so I won't go further into details in here.
+---
+
+PS: The protocols in each group would take a whole another analysis to cover, so I won't go further into details in here.
 
 ---
 
@@ -875,7 +899,7 @@ Before moving on though, it needs to do one more critical task.
 Up until this point, we have analyzed lots of different aspects of IP, but one aspect was still missing.
 Now is the perfect time to analyze it - and that is the fact that some IP addresses are _public_, and some of them are _private_.
 
-The main difference between a public IP address and a private one is about routing - _private IP addresses are not routable, only public IP addresses are routable_.
+The main difference between a public IP address and a private one is about routing - _private IP addresses are not routable, only public IP addresses are_.
 
 Here is a list of _private IP address ranges_ that helps to understand whether our IP address is public or private:
 
@@ -896,7 +920,7 @@ And at this point, we uncover another important concept about routing, which is 
 ### Network Address Translation (NAT)
 
 NAT is a concept that is used to _map private IP addresses to public IP addresses_, so that hosts with private IP addresses can send packets to the public, and vice versa.
-Without NAT, we wouldn't be able to connect to a remote network from our home networks, or private networks administrated by companies.
+Without NAT, we wouldn't be able to connect to a remote network from our home networks or private networks administrated by companies would have no access to public networks.
 
 NAT also allows us to rely on private IP addresses, without it, we would have to configure public IP addresses for each and every host we have in our networks.
 By doing so, we would quickly eat the available IP pool.
@@ -907,8 +931,6 @@ Likewise, when a remote packet comes to a router, the \*destination IP address o
 
 NAT uses a _translation table_ to keep a track of the private-public IP address mappings.
 There are 3 different types of NAT, so let's talk about them a little bit.
-
----
 
 #### Static NAT
 
@@ -934,20 +956,17 @@ That is why - there is another type of NAT that was developed, which is called _
 PAT is a type of NAT that is commonly used in today's networks.
 The address translation in PAT is done by source ports, instead of IP addresses themselves.
 In this concept, there is only _one public IP address_ that is used for translation, but _the ports of the public IP address change based on the source ports of each host_.
-
 By utilizing ports, even if NAT uses only one public IP address, it knows how to map back and forth.
 
----
-
-Now that we know how our private host sends packets: _our gateway uses NAT to make the address routable_.
+Now we know how our private host sends packets: _our gateway uses NAT to make the address routable_.
 
 ### Summary
 
 We covered a lot in this part of the analysis - let's summarize the outcomes:
 
 - Once analog signals hit our gateway, L1 demodularizes those signals back to digital, and forwards it to L2.
-- L2 creates frames from digital signals, and it runs its own Frame Check Sequence to ensure that data integrity is preserved.
-- L2 checks the Ether-field header of the frames and forwards it to appropriate L3 protocol - in this case IP.
+- L2 creates frames from digital signals, and it runs its own Cyclic Redundancy Check to ensure that data integrity is preserved.
+- L2 checks the EtherType header of the frames and forwards it to appropriate L3 protocol - in this case IP.
 - IP checks the destination IP address and understands that it is destined for a remote network.
 - To determine the best possible path for the packet, gateway checks its routing table. This table is updated by either statically or via dynamic routing protocols.
 - Once the path is determined, our gateway applies NAT to the private source IP address to make the packet routable.
@@ -961,14 +980,14 @@ As you might guess, there is still quite a bit to analyze, so let's move on the 
 
 We left the journey at our gateway, which picked up the analog radio signals from our host and eventually extracted the given packet.
 It checked its own routing table to determine the best path for the given destination IP address.
-Once the path is determined, it proceeded to forward the packet.
+Once it determined the best path for that packet, it proceeded with the transmission.
 
 However, by determining the path, it brought us some questions along with it:
 
 - Can we see the path that `ping` takes?
 - Is it a path that straight goes to the remote host, or is it something else?
 
-Thus, let's analyze the path to answer these questions.
+So let's try to answer these questions.
 
 ### The Determined Path
 
@@ -1005,8 +1024,8 @@ traceroute 192.168.1.1
 # 1  192.168.1.1 (192.168.1.1)  6.853 ms  2.236 ms  2.844 ms
 ```
 
-As you probably guessed, since our gateway lives on the local test network, the given path does not have any "intermediate gateways.
-The packet straight goes to the gateway.
+As you probably guessed, since our gateway lives on the local test network, the given path does not have any "intermediate" gateways.
+The packet straight goes to our gateway.
 This was an easy one.
 
 Let's see what happens when we use `traceroute` for `google.com`. Remember, our destination IP address is `172.217.169.206`:
@@ -1060,6 +1079,12 @@ This can mean two things:
 
 If we had the administration of that gateway, we would be able to understand the exact reason.
 
+---
+
+PS: I would really recommend you to check the man pages for `traceroute`, it has a couple of examples and detailed explanations of them.
+
+---
+
 The last interesting thing on our output is really subtle - it is the fact that our third gateway has _an private IP address_ associated with it.
 We just talked about private IP addresses being non-routable - so how is this possible?
 
@@ -1069,7 +1094,7 @@ To understand this, let's take a closer look at how `traceroute` prints a gatewa
 - When TTL is expired on a certain router, it returns an ICMP error packet back to the source host, **assigning its IP address as source address**.
 - If the error packet manages to reach back to our host, `traceroute` sees that an error occured from a new location, thus it extracts the source IP address from that error packet and prints it with other metrics.
 
-Now, the reason why we see a private IP address is because the ICMP error packet actually comes from **a private gateway in a remote network**, and since it does not have a public IP address, it puts its private IP address instead.
+Now, the reason why we see a private IP address is because the ICMP error packet actually comes from **a private gateway in a remote network**, and since it does not have a public IP address, it puts the only address it has - a private one.
 
 ---
 
@@ -1080,7 +1105,7 @@ PS: A private gateway in this context means a gateway that is responsible from c
 This is actually expected when it comes to gateways managed by ISPs.
 ISPs have huge networks and if every gateway in those networks had a public IP address, we would run out of available IP addresses way sooner.
 
-This is why the third gateway is pretty interesting, it basically tells us that **the path that goes to google.com contains a private network**.
+This is why the third gateway is pretty interesting, it basically tells us that **one of the possible paths that goes to google.com contains a private network**.
 
 ### Summary
 
@@ -1096,7 +1121,7 @@ Based on the output from `traceroute`, we can say that:
 - The path that goes to `google.com` consists of many different gateways around the world - it's not a path that goes straight without any gateways in between.
 
 We almost completed the first part of our analysis.
-Now comes the second part - the ICMP Echo reply packet which is generated at the destination host.
+Now comes the second part - the ICMP Echo response which is generated at the destination host.
 
 ## Step 7: Here Comes the ICMP Response
 
@@ -1117,17 +1142,17 @@ PS: Here is a reminder - the physical path of a packet is the responsiblity of L
 So, at this point, here are steps from L1 to L3 on our destination host:
 
 - L1 takes the digital signals and forwards it to L2.
-- L2 extracts frames from digital signals, and it also runs a FCS (Frame Check Sequence) to see whether the data integrity is preserved.
-- L2 sees that the Ether-field header value is IP, so it forwards to IP at L3.
+- L2 extracts frames from digital signals, and it also runs a CRC (Cyclic Redundancy Check) to see whether the data integrity is preserved.
+- L2 sees that the EtherType header value is IP, so it forwards to IP at L3.
 - IP extracts the packet from frames, and checks the destination IP address.
 - Once the destination address matches with our destination host's IP address, IP checks the Protocol field and sees that ICMP is responsible from creating this packet.
 - IP forwards the packet to ICMP.
 
-As you can see, these steps are the exact same steps our gateway used when it received an analog signal from our host.
+As you can see, these steps are the more or less the same steps our gateway used when it received an analog signal from our host.
 
 Here is the part that is different - once ICMP gets the packet from our source host, it sees that it is a Echo packet, and prepares an Echo response packet to answer our host.
 At this point, we are back to L3 on our destination host.
-This time, the source IP address of the ICMP Echo response packet is actually _our destination address_ `172.217.169.206`, because `google.com` will transmit a packet back to our test host.
+This time, the source IP address of the ICMP Echo response packet is actually _our destination address_ `172.217.169.206`, because this time the destination will transmit a packet back to our test host.
 But what about the destination IP address?
 
 Remember that our host address `192.168.1.101` is a private IP address, and it is not routable.
@@ -1144,14 +1169,6 @@ To understand the differences clearly, here is a visual representation of the pa
 
 From here until the response packet hits our gateway - the steps are pretty much the same.
 
----
-
-PS: Since the exact configuration of `google.com` is not as simple as our test network and more or less unknown, at this point of the analysis it is not practical to go further into detail.
-Google uses a cluster of servers, and utilizes different concepts to deal with the incoming traffic.
-However, communication wise, it is exactly the same - our host lives on a remote network from Google's perspective, so regardless of the configuration they have, one of their gateways gets the ICMP response packet and transmits it by using the most performant path.
-
----
-
 ## Step 8: The Journey Ends Here
 
 Unfortunately, we are coming to the end of our analysis, and this section is not as exciting as previous ones due to the fact that the same concepts are used on our way back.
@@ -1165,14 +1182,28 @@ So, let's quickly take a look at what happens when the ICMP response hits our ga
 And here is the last part on our host:
 
 - Analog radio signals are picked up by L1, demodularized into digital signals, and forwarded to L2.
-- L2 extracts frames from signals, runs it's own FCS to check the data integrity.
+- L2 extracts frames from signals, runs it's own CRC to check the data integrity.
 - L2 hands the frames over to L3 IP, and the packet is extracted from frames.
 - IP checks the destination address and understands that the packet belongs to the host itself.
 - IP hands over to ICMP (by looking at the Protocol header value) and ICMP understands that this is an Echo response coming from `google.com`.
-- At the end, `ping` reads the ICMP response and outputs it to stdout (by default).
+- At the end, `ping` reads the ICMP response and outputs it to stdout.
+
+The ICMP response we are talking about is the very first output we looked at in this analysis:
+
+```bash
+ping -c1 google.com
+
+# PING google.com (172.217.169.206): 56 data bytes
+# 64 bytes from 172.217.169.206: icmp_seq=0 ttl=56 time=26.257 ms
+#
+# --- google.com ping statistics ---
+# 1 packets transmitted, 1 packets received, 0.0% packet loss
+# round-trip min/avg/max/stddev = 26.257/26.257/26.257/nan ms
+```
 
 Like I said, there is nothing new on this section, but we had to take a look at the response as well to see the whole picture.
 
+Now you will never be able to see `ping` like before!
 With that said, we can conclude our analysis.
 I would like to encourage you to try all the commands that are used in here.
 If you want to dive even deeper, I would recommend installing [Wireshark](https://www.wireshark.org/) to analyze your own network.
