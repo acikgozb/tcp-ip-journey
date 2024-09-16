@@ -1,4 +1,4 @@
-# Step 4: The Journey of a Packet - Part 1 (Host)
+# Step 5: The Journey of a Packet - Part 1 (Host)
 
 ## Table of Contents
 

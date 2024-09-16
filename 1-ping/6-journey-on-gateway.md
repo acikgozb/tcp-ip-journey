@@ -1,4 +1,4 @@
-# Step 5: The Journey of a Packet - Part 2 (Gateway)
+# Step 6: The Journey of a Packet - Part 2 (Gateway)
 
 ## Table of Contents
 

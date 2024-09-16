@@ -1,4 +1,4 @@
-# Step 7: Here Comes the ICMP Response
+# Step 8: Here Comes the ICMP Response
 
 Let's sum up where are we at in this analysis:
 
