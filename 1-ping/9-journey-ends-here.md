@@ -1,4 +1,4 @@
-# Step 8: The Journey Ends Here
+# Step 9: The Journey Ends Here
 
 Unfortunately, we are coming to the end of our analysis, and this chapter is not as exciting as previous ones due to the fact that the same concepts are used on our way back.
 So, let's quickly take a look at what happens when the ICMP response hits our gateway:

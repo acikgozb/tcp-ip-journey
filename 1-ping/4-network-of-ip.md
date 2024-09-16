@@ -1,4 +1,4 @@
-# Step 3: Where Does the IP Belong?
+# Step 4: Where Does the IP Belong?
 
 ## Table of Contents
 

@@ -1,4 +1,4 @@
-# Step 6: The Journey of a Packet - Part 3 (Hops)
+# Step 7: The Journey of a Packet - Part 3 (Hops)
 
 ## Table of Contents
 
