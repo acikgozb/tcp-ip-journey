@@ -55,7 +55,7 @@ So, how does this "name resolution" actually work?
 ## <a id='name-resolution-through-a-dns-server'/> Name Resolution Through a DNS Server
 
 Lets talk about DNS a little bit.
-DNS is a **L7 (Application Layer) Service** that allows us to find the IP address of a requested resource.
+DNS is a **L4 (Application Layer) Service** that allows us to find the IP address of a requested resource.
 Based on the implementation, it can leverage both of the **L4 (Transport layer) protocols TCP/UDP** and it's **well-defined port number is 53**.
 
 ---

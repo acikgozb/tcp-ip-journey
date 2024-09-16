@@ -18,7 +18,7 @@
 Here is a quick rundown of what we have gone through in our analysis so far:
 
 - `ping` uses an L3 ICMP packet to test the connection with a specific host.
-- When a domain name is given to `ping`, it gets the IP address first via L7 DNS name resolution.
+- When a domain name is given to `ping`, it gets the IP address first via L4 DNS name resolution.
 - After getting the IP address, L3 IP checks the source and destination address and decides to forward the packet to the gateway of the network.
 - In order to physically move the packet to the gateway, L3 ARP is used to get the MAC address, then the packet is sent down to L2 to start the transmission.
 - L2 creates frames from the packet, and forwards it to L1 (Physical) to transmit the frames via the configured physical medium (wireless).
