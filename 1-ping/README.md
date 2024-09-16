@@ -39,7 +39,7 @@ Alright, let's see where this study takes us.
 Like it is mentioned above, `ping` is a Unix tool that is used to test a connection to a host.
 
 One of the important things about `ping` is that it uses _Internet Control Management Protocol_ (ICMP) packets to test the connection.
-This protocol lives on L3 of the _TCP/IP_ model (Network/Internet Layer), which allows our analysis to focus purely on the connection, unlike L7 protocols such as _HTTP/HTTPS_ or _FTP_.
+This protocol lives on L3 of the _TCP/IP_ model (Network/Internet Layer), which allows our analysis to focus purely on the connection, unlike L4 protocols such as _HTTP/HTTPS_ or _FTP_.
 Since ICMP lives on L3, it does not use _TCP_ or _UDP_ to function. It is encapsulated in a _IPv4_ packet.
 
 ICMP is mainly used to understand the _state_ of the transmitted packet. Based on the status of the remote location, ICMP can return messages like:
