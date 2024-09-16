@@ -44,4 +44,4 @@ To understand the differences clearly, here is a visual representation of the pa
 
 From here until the response packet hits our gateway - the steps are pretty much the same.
 
-[Previous Chapter](./6-journey-on-hops.md) | [Next Chapter](./8-journey-ends-here.md) | [Main README](./README.md)
+[Previous Chapter](./7-journey-on-hops.md) | [Next Chapter](./9-journey-ends-here.md) | [Main README](./README.md)

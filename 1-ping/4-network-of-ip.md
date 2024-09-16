@@ -23,7 +23,7 @@ ping -c1 google.com
 # round-trip min/avg/max/stddev = 26.257/26.257/26.257/nan ms
 ```
 
-We know from our discussions that the IP address we see (`172.217.169.206`) comes from our DNS server.
+We know from our discussions that the IP address we see (`172.217.169.206`) comes from our DNS server and it is configured via DHCP.
 We also know that our `ping` successfully transmits a packet to `google.com`.
 
 Here comes the next question - is the IP address `172.217.169.206` points to a remote host or is it actually a host on our test network?
@@ -227,4 +227,4 @@ So the ICMP packet needs to travel through the Internet. How does this happen?
 
 Like I said, it's getting better and better on each chapter.
 
-[Previous Chapter](./2-dns.md) | [Next Chapter](./4-journey-on-host.md) | [Main README](./README.md)
+[Previous Chapter](./3-ip-configuration.md) | [Next Chapter](./5-journey-on-host.md) | [Main README](./README.md)

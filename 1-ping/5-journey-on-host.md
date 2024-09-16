@@ -180,4 +180,4 @@ And with this chapter, we have completed our analysis of the first part of the j
 
 Now, let's proceed with the analysis and see what happens when the signals hit the gateway.
 
-[Previous Chapter](./3-ip.md) | [Next Chapter](./5-journey-on-gateway.md) | [Main README](./README.md)
+[Previous Chapter](./4-network-of-ip.md) | [Next Chapter](./6-journey-on-gateway.md) | [Main README](./README.md)

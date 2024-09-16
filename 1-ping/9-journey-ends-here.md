@@ -32,4 +32,4 @@ ping -c1 google.com
 
 Like I said, if you read the previous chapters there is nothing new on this one, but we had to take a look at the response as well to see the whole picture.
 
-[Previous Chapter](./7-icmp-response.md) | [Main README](./README.md)
+[Previous Chapter](./8-icmp-response.md) | [Main README](./README.md)

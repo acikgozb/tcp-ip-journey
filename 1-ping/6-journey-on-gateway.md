@@ -188,4 +188,4 @@ This is pretty much it, now the ICMP `ping` packet is officially out of our loca
 Is the journey completed though?
 As you might guess, there is still quite a bit to analyze, so let's move on the third part of the journey.
 
-[Previous Chapter](./4-journey-on-host.md) | [Next Chapter](./6-journey-on-hops.md) | [Main README](./README.md)
+[Previous Chapter](./5-journey-on-host.md) | [Next Chapter](./7-journey-on-hops.md) | [Main README](./README.md)

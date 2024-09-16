@@ -155,4 +155,4 @@ Based on the output from `traceroute`, we can say that:
 We almost completed the first part of our analysis.
 Now comes the second part - the ICMP Echo response which is generated at the destination host.
 
-[Previous Chapter](./5-journey-on-gateway.md) | [Next Chapter](./7-icmp-response.md) | [Main README](./README.md)
+[Previous Chapter](./6-journey-on-gateway.md) | [Next Chapter](./8-icmp-response.md) | [Main README](./README.md)

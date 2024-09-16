@@ -278,4 +278,4 @@ Now that we have the IP address on our hands and we actually saw where that addr
 
 Trust me, the further we proceed the better it gets.
 
-[Previous Chapter](./1-the-local-network.md) | [Next Chapter](./3-ip.md) | [Main README](./README.md)
+[Previous Chapter](./1-the-local-network.md) | [Next Chapter](./3-ip-configuration.md) | [Main README](./README.md)

@@ -2,6 +2,7 @@
 
 This study contains an analysis of `ping`, a tool that is commonly used to test connections to hosts.
 It focuses on pinging `google.com`, which is a well-known website.
+The goal is to explore how it works and briefly mention the concepts that are used.
 
 First of all, I would like to thank you for checking it out.
 I tried to make it as intriguing as possible without going too much into details.
@@ -12,7 +13,11 @@ Since it is a tool that is frequently used, I thought it would be a nice topic t
 
 Before starting the analysis, I want to point out a couple of things:
 
-- The notes provided in here are just my understanding of several networking concepts. There may be some misunderstandings, and if that is the case I would really like to have a feedback from you to correct it, if you have time.
+- The notes provided in here are just my understanding of several networking concepts.
+  There may be some misunderstandings, and if that is the case I would really like to have a feedback from you to correct it, if you have time.
+
+- There were times where I had to explain a specific networking concept briefly to not steer too much away from the main topic.
+  Therefore the concepts that are explained in this study are actually much more deep than what they appear to be.
 
 - No AI was harmed during the process.
 
@@ -101,12 +106,13 @@ Since the analysis is a bit long, I divided it into chapters - you can find them
 
 - [Step 1: The Local Network](./1-the-local-network.md)
 - [Step 2: DNS Is Only For Humans](./2-dns.md)
-- [Step 3: Where Does the IP Belong?](./3-ip.md)
-- [Step 4: The Journey of a Packet - Part 1 (Host)](./4-journey-on-host.md)
-- [Step 5: The Journey of a Packet - Part 2 (Gateway)](./5-journey-on-gateway.md)
-- [Step 6: The Journey of a Packet - Part 3 (Hops)](./6-journey-on-hops.md)
-- [Step 7: Here Comes the ICMP Response](./7-icmp-response.md)
-- [Step 8: The Journey Ends Here](./8-journey-ends-here.md)
+- [Step 3: How Is an IP Configured?](./3-ip-configuration.md)
+- [Step 4: Where Does an IP Belong?](./4-network-of-ip.md)
+- [Step 5: The Journey of a Packet - Part 1 (Host)](./5-journey-on-host.md)
+- [Step 6: The Journey of a Packet - Part 2 (Gateway)](./6-journey-on-gateway.md)
+- [Step 7: The Journey of a Packet - Part 3 (Hops)](./7-journey-on-hops.md)
+- [Step 8: Here Comes the ICMP Response](./8-icmp-response.md)
+- [Step 9: The Journey Ends Here](./9-journey-ends-here.md)
 
 ## <a id='conclusion'/> Conclusion
 
