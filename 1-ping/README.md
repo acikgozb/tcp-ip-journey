@@ -4,25 +4,6 @@ This study contains an analysis of `ping`, a tool that is commonly used to test 
 It focuses on pinging `google.com`, which is a well-known website.
 The goal is to explore how it works and briefly mention the concepts that are used.
 
-First of all, I would like to thank you for checking it out.
-I tried to make it as intriguing as possible without going too much into details.
-I was curious about the way `ping` works whilst studying networking for the past 1.5 months, thus I wanted to write an analysis about it to reinforce my understanding.
-Since it is a tool that is frequently used, I thought it would be a nice topic to discuss.
-
-## First, a Disclaimer
-
-Before starting the analysis, I want to point out a couple of things:
-
-- The notes provided in here are just my understanding of several networking concepts.
-  There may be some misunderstandings, and if that is the case I would really like to have a feedback from you to correct it, if you have time.
-
-- There were times where I had to explain a specific networking concept briefly to not steer too much away from the main topic.
-  Therefore the concepts that are explained in this study are actually much more deep than what they appear to be.
-
-- No AI was harmed during the process.
-
-Alright, let's see where this study takes us.
-
 ## Table of Contents
 
 <!--toc:start-->
